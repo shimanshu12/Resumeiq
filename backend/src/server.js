@@ -12,9 +12,24 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+const rawClientOrigin = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+const allowedOrigins = rawClientOrigin.split(',').map((o) => o.trim());
+const reflectOrigin = (process.env.REFLECT_ORIGIN || 'false').toLowerCase() === 'true';
+
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+    origin: (incomingOrigin, callback) => {
+      if (!incomingOrigin) return callback(null, true); // allow server-to-server or tools like Postman
+      if (reflectOrigin) {
+        console.warn('CORS reflect enabled — allowing origin:', incomingOrigin);
+        return callback(null, true);
+      }
+      if (allowedOrigins.includes('*') || allowedOrigins.includes(incomingOrigin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   })
 );
@@ -87,4 +102,5 @@ app.use((req, res) => {
 // ======================
 app.listen(PORT, () => {
   console.log(`🚀 ResumeIQ backend running on port ${PORT}`);
+  console.log('Configured allowed origins:', allowedOrigins);
 });
