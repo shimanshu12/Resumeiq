@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-base-900 text-ink-primary font-body antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display;
+  }
+  ::selection {
+    @apply bg-accent-purple/40;
+  }
+  :focus-visible {
+    outline: 2px solid #22D3EE;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply relative bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-glow;
+  }
+
+  .glass-nav {
+    @apply bg-base-900/60 backdrop-blur-xl border border-white/[0.08];
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-grad-primary px-6 py-3
+           font-semibold text-white shadow-glow transition-transform duration-200
+           hover:scale-[1.03] active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03]
+           px-6 py-3 font-semibold text-ink-primary transition-colors duration-200 hover:bg-white/[0.08];
+  }
+
+  .input-glass {
+    @apply w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-ink-primary
+           placeholder:text-ink-faint focus:border-accent-cyan/50 focus:outline-none transition-colors;
+  }
+
+  .badge-match {
+    @apply inline-flex items-center rounded-full border border-accent-emerald/30 bg-accent-emerald/10
+           px-3 py-1 text-xs font-medium text-accent-emerald;
+  }
+
+  .badge-missing {
+    @apply inline-flex items-center rounded-full border border-red-400/30 bg-red-400/10
+           px-3 py-1 text-xs font-medium text-red-300;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.4);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
