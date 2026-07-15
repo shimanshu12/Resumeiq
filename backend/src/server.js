@@ -78,6 +78,10 @@ app.get('/api/health', (req, res) => {
 // ======================
 app.use('/api/resumes', resumeRoutes);
 app.use('/api/reports', reportRoutes);
+// Also mount routes without the `/api` prefix to support frontends
+// that call the root paths (some deployed builds may omit the `/api` base).
+app.use('/resumes', resumeRoutes);
+app.use('/reports', reportRoutes);
 
 // ======================
 // Error Handler
