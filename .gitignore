@@ -1,5 +1,23 @@
+# Dependencies
 node_modules/
-dist/
+
+# Environment files
 .env
-.DS_Store
+.env.*
+backend/.env
+backend/.env.example
+frontend/.env
+frontend/.env.example
+
+# Build files
+dist/
+build/
+
+# Logs
 *.log
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
