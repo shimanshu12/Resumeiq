@@ -28,6 +28,17 @@ app.use(
         return callback(null, true);
       }
 
+      // Allow common hosting provider subdomains used in this project
+      try {
+        const lc = incomingOrigin.toLowerCase();
+        if (lc.endsWith('.vercel.app') || lc.endsWith('.onrender.com')) {
+          console.warn('CORS allowing hosting subdomain origin:', incomingOrigin);
+          return callback(null, true);
+        }
+      } catch (e) {
+        // ignore and fall through to deny
+      }
+
       return callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
