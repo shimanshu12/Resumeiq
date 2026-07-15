@@ -37,6 +37,7 @@ export async function analyzeResume(req, res) {
     if (uploadError) throw uploadError;
 
     const { data: publicUrlData } = supabaseAdmin.storage.from(RESUME_BUCKET).getPublicUrl(storagePath);
+    console.log('Uploaded resume to storagePath:', storagePath, 'publicUrl:', publicUrlData?.publicUrl);
 
     // 2. Run the matching engine
     const match = matchResumeToJobDescription(resumeText, jobDescription);
@@ -65,6 +66,8 @@ export async function analyzeResume(req, res) {
       })
       .select()
       .single();
+
+    console.log('Inserted report:', report?.id || report);
 
     if (insertError) throw insertError;
 
