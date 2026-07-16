@@ -69,14 +69,30 @@ export default function ReportDetail() {
           <h1 className="font-display text-2xl font-bold">{report.resume_name}</h1>
           <p className="mt-1 text-ink-muted">Analyzed on {new Date(report.created_at).toLocaleString()}</p>
         </div>
-        <a
-          href={`${import.meta.env.VITE_API_BASE_URL}/reports/${report.id}/pdf`}
-          target="_blank"
-          rel="noreferrer"
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              const { data: sessionData } = await (await import('../supabase/supabaseClient')).supabase.auth.getSession();
+              const token = sessionData?.session?.access_token;
+              if (!token) {
+                toast.error('Please log in again. Missing authentication token.');
+                return;
+              }
+
+              window.open(
+                `${import.meta.env.VITE_API_BASE_URL}/reports/${report.id}/pdf?token=${encodeURIComponent(token)}`,
+                '_blank',
+                'noopener,noreferrer'
+              );
+            } catch {
+              toast.error('Could not prepare PDF download. Please try again.');
+            }
+          }}
           className="btn-primary"
         >
           <Download size={16} /> Download PDF Report
-        </a>
+        </button>
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">

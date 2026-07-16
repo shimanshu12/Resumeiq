@@ -38,7 +38,9 @@ export default function Dashboard() {
 
   const recent = summary?.recent || [];
   const chartData = {
-    labels: [...recent].reverse().map((r) => new Date(r.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })),
+    labels: [...recent]
+      .reverse()
+      .map((r) => new Date(r.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })),
     datasets: [
       {
         label: 'ATS Score',
@@ -55,10 +57,10 @@ export default function Dashboard() {
   return (
     <div className="pb-16">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <GlassCard className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+        <GlassCard className="flex flex-col items-start justify-between gap-6 p-6 md:flex-row md:items-center">
           <div>
-            <h1 className="font-display text-2xl font-bold">Welcome back, {firstName} 👋</h1>
-            <p className="mt-1 text-ink-muted">Here's how your resume is performing across your recent analyses.</p>
+            <h1 className="font-display text-2xl font-bold tracking-tight">Welcome back, {firstName} 👋</h1>
+            <p className="mt-1 text-ink-muted">Your ATS performance across recent analyses.</p>
           </div>
           <Link to="/upload" className="btn-primary whitespace-nowrap">
             <UploadIcon size={18} /> New Analysis
@@ -74,16 +76,45 @@ export default function Dashboard() {
         </div>
       ) : (
         <div className="mt-6 grid gap-6 md:grid-cols-3">
-          <StatCard icon={FileText} label="Total Analyses" value={summary?.totalAnalyses || 0} accent="blue" delay={0} />
-          <StatCard icon={Award} label="Highest ATS Score" value={summary?.highestScore || 0} suffix="%" accent="emerald" delay={0.1} />
-          <StatCard icon={TrendingUp} label="Average Score" value={summary?.averageScore || 0} suffix="%" accent="purple" delay={0.2} />
+          <StatCard
+            icon={FileText}
+            label="Total Analyses"
+            value={summary?.totalAnalyses || 0}
+            accent="blue"
+            delay={0}
+          />
+          <StatCard
+            icon={Award}
+            label="Highest ATS Score"
+            value={summary?.highestScore || 0}
+            suffix="%"
+            accent="emerald"
+            delay={0.1}
+          />
+          <StatCard
+            icon={TrendingUp}
+            label="Average Score"
+            value={summary?.averageScore || 0}
+            suffix="%"
+            accent="purple"
+            delay={0.2}
+          />
         </div>
       )}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <GlassCard className="lg:col-span-2" delay={0.1}>
-          <h2 className="font-display text-lg font-semibold">Score Trend</h2>
-          <p className="text-sm text-ink-muted">Your last {recent.length || 0} analyses.</p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="font-display text-lg font-semibold">Score Trend</h2>
+              <p className="text-sm text-ink-muted">Your last {recent.length || 0} analyses.</p>
+            </div>
+            {recent.length > 0 && (
+              <p className="text-xs text-ink-faint">
+                Latest: <span className="font-mono text-accent-cyan">{recent[0]?.ats_score}%</span>
+              </p>
+            )}
+          </div>
           <div className="mt-4 h-64">
             {recent.length > 0 ? (
               <Line
@@ -93,7 +124,12 @@ export default function Dashboard() {
                   maintainAspectRatio: false,
                   scales: {
                     x: { grid: { display: false }, ticks: { color: '#94A3B8' } },
-                    y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94A3B8' } },
+                    y: {
+                      min: 0,
+                      max: 100,
+                      grid: { color: 'rgba(255,255,255,0.05)' },
+                      ticks: { color: '#94A3B8' },
+                    },
                   },
                   plugins: { legend: { display: false } },
                 }}
@@ -118,25 +154,35 @@ export default function Dashboard() {
           </Link>
         </div>
         <div className="mt-4 space-y-3">
-          {recent.length === 0 && <p className="text-sm text-ink-muted">No analyses yet — upload a resume to get started.</p>}
-          {recent.map((r, i) => (
-            <Link
-              key={i}
-              to={`/reports/${r.id || ''}`}
-              className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 transition-colors hover:bg-white/[0.05]"
-            >
-              <div>
-                <p className="text-sm font-medium">{r.resume_name}</p>
-                <p className="text-xs text-ink-faint">{new Date(r.created_at).toLocaleDateString()}</p>
-              </div>
-              <span className="font-mono font-semibold text-accent-cyan">{r.ats_score}%</span>
-            </Link>
-          ))}
+          {recent.length === 0 ? (
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-sm text-ink-muted">
+              <p className="font-medium">No analyses yet.</p>
+              <p className="mt-1">Upload a resume to generate your first ATS report.</p>
+            </div>
+          ) : (
+            recent.map((r, i) => (
+              <Link
+                key={i}
+                to={`/reports/${r.id || ''}`}
+                className="group flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 transition-all hover:bg-white/[0.05] hover:shadow-glow"
+              >
+                <div>
+                  <p className="text-sm font-medium group-hover:text-ink-primary">{r.resume_name}</p>
+                  <p className="text-xs text-ink-faint">{new Date(r.created_at).toLocaleDateString()}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="font-mono font-semibold text-accent-cyan">{r.ats_score}%</span>
+                  <ArrowRight className="text-ink-faint transition-colors group-hover:text-accent-cyan" size={16} />
+                </div>
+              </Link>
+            ))
+          )}
         </div>
       </GlassCard>
     </div>
   );
 }
+
 
 function EmptyState() {
   return (

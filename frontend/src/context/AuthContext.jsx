@@ -24,7 +24,10 @@ export function AuthProvider({ children }) {
     return supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName } },
+      options: {
+        data: { full_name: fullName },
+        emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/login` : undefined,
+      },
     });
   };
 
