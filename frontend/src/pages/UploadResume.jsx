@@ -161,6 +161,23 @@ export default function UploadResume() {
   );
 }
 
+async function downloadReportPdf(reportId) {
+  try {
+    const response = await api.get(`/reports/${reportId}/pdf`, { responseType: 'blob' });
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ResumeIQ-Report-${reportId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    toast.error('Could not download the PDF. Please try again.');
+  }
+}
+
 function ResultPanel({ report }) {
   const showConfetti = report.ats_score > 90;
 
@@ -204,9 +221,9 @@ function ResultPanel({ report }) {
 
           <div className="mt-4 flex gap-3">
             <Link to={`/reports/${report.id}`} className="btn-ghost">View Full Report</Link>
-            <a href={`${import.meta.env.VITE_API_BASE_URL}/reports/${report.id}/pdf`} target="_blank" rel="noreferrer" className="btn-primary">
+            <button onClick={() => downloadReportPdf(report.id)} className="btn-primary">
               <Download size={16} /> Download PDF
-            </a>
+            </button>
           </div>
         </div>
       </GlassCard>

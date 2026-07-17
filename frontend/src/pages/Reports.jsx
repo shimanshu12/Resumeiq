@@ -1,11 +1,30 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Eye, Trash2, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import toast from 'react-hot-toast';
 import GlassCard from '../components/GlassCard';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import { useReports } from '../hooks/useReports';
+import api from '../services/api';
 
 const PAGE_SIZE = 8;
+
+async function downloadReportPdf(reportId) {
+  try {
+    const response = await api.get(`/reports/${reportId}/pdf`, { responseType: 'blob' });
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ResumeIQ-Report-${reportId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    toast.error('Could not download the PDF. Please try again.');
+  }
+}
 
 export default function Reports() {
   const [search, setSearch] = useState('');
@@ -77,15 +96,13 @@ export default function Reports() {
                         <Link to={`/reports/${r.id}`} className="text-ink-muted hover:text-accent-cyan" aria-label="View report">
                           <Eye size={16} />
                         </Link>
-                        <a
-                          href={`${import.meta.env.VITE_API_BASE_URL}/reports/${r.id}/pdf`}
-                          target="_blank"
-                          rel="noreferrer"
+                        <button
+                          onClick={() => downloadReportPdf(r.id)}
                           className="text-ink-muted hover:text-accent-emerald"
                           aria-label="Download PDF"
                         >
                           <Download size={16} />
-                        </a>
+                        </button>
                         <button onClick={() => deleteReport(r.id)} className="text-ink-muted hover:text-red-400" aria-label="Delete report">
                           <Trash2 size={16} />
                         </button>

@@ -73,20 +73,18 @@ export default function ReportDetail() {
           type="button"
           onClick={async () => {
             try {
-              const { data: sessionData } = await (await import('../supabase/supabaseClient')).supabase.auth.getSession();
-              const token = sessionData?.session?.access_token;
-              if (!token) {
-                toast.error('Please log in again. Missing authentication token.');
-                return;
-              }
-
-              window.open(
-                `${import.meta.env.VITE_API_BASE_URL}/reports/${report.id}/pdf?token=${encodeURIComponent(token)}`,
-                '_blank',
-                'noopener,noreferrer'
-              );
+              const response = await api.get(`/reports/${report.id}/pdf`, { responseType: 'blob' });
+              const blob = new Blob([response.data], { type: 'application/pdf' });
+              const url = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `ResumeIQ-Report-${report.id}.pdf`;
+              document.body.appendChild(link);
+              link.click();
+              link.remove();
+              window.URL.revokeObjectURL(url);
             } catch {
-              toast.error('Could not prepare PDF download. Please try again.');
+              toast.error('Could not download the PDF. Please try again.');
             }
           }}
           className="btn-primary"
